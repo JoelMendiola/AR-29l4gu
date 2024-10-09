@@ -25,36 +25,31 @@
 
   <body style="margin: 0; overflow: hidden">
     <div id="slider-container">
+      <!-- Sliders for rotation -->
       <label>X Rotation: <span id="valueX">0</span>°</label>
-      <input
-        type="range"
-        id="sliderX"
-        class="slider"
-        min="0"
-        max="360"
-        value="0"
-      />
+      <input type="range" id="sliderX" class="slider" min="0" max="360" value="0" />
 
       <label>Y Rotation: <span id="valueY">0</span>°</label>
-      <input
-        type="range"
-        id="sliderY"
-        class="slider"
-        min="0"
-        max="360"
-        value="0"
-      />
+      <input type="range" id="sliderY" class="slider" min="0" max="360" value="0" />
 
       <label>Z Rotation: <span id="valueZ">0</span>°</label>
-      <input
-        type="range"
-        id="sliderZ"
-        class="slider"
-        min="0"
-        max="360"
-        value="0"
-      />
+      <input type="range" id="sliderZ" class="slider" min="0" max="360" value="0" />
+
+      <!-- Sliders for scale -->
+      <label>Scale: <span id="valueScale">1</span></label>
+      <input type="range" id="sliderScale" class="slider" min="0.1" max="5" step="0.1" value="1" />
+
+      <!-- Sliders for position -->
+      <label>X Position: <span id="valuePosX">0</span></label>
+      <input type="range" id="sliderPosX" class="slider" min="-5" max="5" step="0.1" value="0" />
+
+      <label>Y Position: <span id="valuePosY">0</span></label>
+      <input type="range" id="sliderPosY" class="slider" min="-5" max="5" step="0.1" value="0" />
+
+      <label>Z Position: <span id="valuePosZ">0</span></label>
+      <input type="range" id="sliderPosZ" class="slider" min="-5" max="5" step="0.1" value="0" />
     </div>
+
     <a-scene
       vr-mode-ui="enabled: false;"
       loading-screen="enabled: false;"
@@ -74,6 +69,7 @@
         cursor="fuse: false; rayOrigin: mouse;"
       >
         <a-image
+          id = "imagen"
           src="assets/calaverita1.jpg"
           scale="1 1 1"
           class="clickable"
@@ -92,65 +88,74 @@
         cursor="fuse: false; rayOrigin: mouse;"
       >
         <a-entity
+          id="myModel"
           gltf-model="assets/asset.gltf"
-          scale="10 10 10"
-          position="0 0 0"
-          rotation="157 281 108"
-          animation="property: rotation; to: 247 281 108; loop: true; dur: 5000; easing: linear"       
-        ></a-entity>
-      </a-marker>
-
-      <!-- Tercer marcador con un video 
-      <a-marker
-        id="marker3"
-        type="pattern"
-        preset="custom"
-        url="assets/marker3.patt"
-        raycaster="objects: .clickable"
-        emitevents="true"
-        cursor="fuse: false; rayOrigin: mouse;"
-      >
-        <a-video
-          src="assets/video.mp4"
           scale="1 1 1"
           position="0 0 0"
-          rotation="-90 0 0"
-          gesture-handler
-        ></a-video>
-      </a-marker> -->
+          rotation="0 0 0"
+        ></a-entity>
+      </a-marker>
 
       <a-entity camera></a-entity>
     </a-scene>
 
     <script>
-      const model = document.getElementById("myModel");
+      const model = document.getElementById("imagen");
+
+      // Sliders for rotation
       const sliderX = document.getElementById("sliderX");
       const sliderY = document.getElementById("sliderY");
       const sliderZ = document.getElementById("sliderZ");
 
+      // Sliders for position
+      const sliderPosX = document.getElementById("sliderPosX");
+      const sliderPosY = document.getElementById("sliderPosY");
+      const sliderPosZ = document.getElementById("sliderPosZ");
+
+      // Slider for scale
+      const sliderScale = document.getElementById("sliderScale");
+
+      // Value displays
       const valueX = document.getElementById("valueX");
       const valueY = document.getElementById("valueY");
       const valueZ = document.getElementById("valueZ");
+      const valuePosX = document.getElementById("valuePosX");
+      const valuePosY = document.getElementById("valuePosY");
+      const valuePosZ = document.getElementById("valuePosZ");
+      const valueScale = document.getElementById("valueScale");
 
-      // Función para actualizar la rotación y los valores en pantalla
-      function updateRotation() {
+      // Update rotation, position, and scale based on slider values
+      function updateAttributes() {
         const rotationX = sliderX.value;
         const rotationY = sliderY.value;
         const rotationZ = sliderZ.value;
+        const posX = sliderPosX.value;
+        const posY = sliderPosY.value;
+        const posZ = sliderPosZ.value;
+        const scale = sliderScale.value;
 
-        model.setAttribute(
-          "rotation",
-          `${rotationX} ${rotationY} ${rotationZ}`
-        );
+        model.setAttribute("rotation", `${rotationX} ${rotationY} ${rotationZ}`);
+        model.setAttribute("position", `${posX} ${posY} ${posZ}`);
+        model.setAttribute("scale", `${scale} ${scale} ${scale}`);
+
+        // Update displayed values
         valueX.textContent = rotationX;
         valueY.textContent = rotationY;
         valueZ.textContent = rotationZ;
+        valuePosX.textContent = posX;
+        valuePosY.textContent = posY;
+        valuePosZ.textContent = posZ;
+        valueScale.textContent = scale;
       }
 
-      // Agregar eventos de entrada a los sliders
-      sliderX.addEventListener("input", updateRotation);
-      sliderY.addEventListener("input", updateRotation);
-      sliderZ.addEventListener("input", updateRotation);
+      // Add input event listeners to sliders
+      sliderX.addEventListener("input", updateAttributes);
+      sliderY.addEventListener("input", updateAttributes);
+      sliderZ.addEventListener("input", updateAttributes);
+      sliderPosX.addEventListener("input", updateAttributes);
+      sliderPosY.addEventListener("input", updateAttributes);
+      sliderPosZ.addEventListener("input", updateAttributes);
+      sliderScale.addEventListener("input", updateAttributes);
     </script>
   </body>
 </html>
