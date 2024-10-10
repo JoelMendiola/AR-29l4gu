@@ -135,13 +135,6 @@
       </a-marker>
 
       <!-- Segundo marcador con un modelo 3D -->
-      <a-assets>
-        <a-asset-item
-          id="animated-asset"
-          src="assets/3D/alebrije-azul.gltf"
-        ></a-asset-item>
-      </a-assets>
-
       <a-marker
         id="animated-marker"
         type="pattern"
@@ -150,17 +143,16 @@
         raycaster="objects: .clickable"
         emitevents="true"
         cursor="fuse: false; rayOrigin: mouse;"
-        id="markerA"
       >
         <a-entity
           id="bowser-model"
           scale="1 1 1"
-          position="0 0 0"
-          rotation="0 0 0"
           animation-mixer="loop: repeat"
-          gltf-model="#animated-asset"
+          gltf-model="assets/3D/alebrije-azul.gltf"
           class="clickable"
           gesture-handler
+          position="0 0 0"
+          rotation="0 0 0"
         ></a-entity>
       </a-marker>
 
