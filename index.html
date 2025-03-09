@@ -1,237 +1,282 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    <script src="https://raw.githack.com/donmccurdy/aframe-extras/master/dist/aframe-extras.loaders.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-detector.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/studio-backend/master/src/modules/marker/tools/gesture-handler.js"></script>
-    <style>
-      #slider-container {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        z-index: 9999;
-        display: flex;
-        flex-direction: column;
+<head>
+  <title>Contoso Sample Web Chat</title> 
+<script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
+<script type="text/javascript" src="https://alcdn.msauth.net/lib/1.2.0/js/msal.js"></script>
+<script src="https://unpkg.com/@azure/storage-blob@10.3.0/browser/azure-storage.blob.min.js"
+  integrity="sha384-fsfhtLyVQo3L3Bh73qgQoRR328xEeXnRGdoi53kjo1uectCfAHFfavrBBN2Nkbdf"
+  crossorigin="anonymous"></script>
+<script type="text/javascript">
+  if (typeof Msal === 'undefined') document.write(unescape("%3Cscript src='https://alcdn.msftauth.net/lib/1.2.0/js/msal.js' type='text/javascript' %3E%3C/script%3E"));
+</script>
+
+  <style>
+      html, body {
+	  height: 100%;
       }
 
-      .slider {
-        margin: 5px;
+      body {
+	  margin: 0;
       }
 
-      .value-display {
-        font-size: 16px;
-      }
-    </style>
-  </head>
-
-  <body style="margin: 0; overflow: hidden">
-    <div id="slider-container">
-      <!-- Sliders for rotation -->
-      <label>X Rotation: <span id="valueX">0</span>°</label>
-      <input
-        type="range"
-        id="sliderX"
-        class="slider"
-        min="0"
-        max="360"
-        value="0"
-      />
-
-      <label>Y Rotation: <span id="valueY">0</span>°</label>
-      <input
-        type="range"
-        id="sliderY"
-        class="slider"
-        min="0"
-        max="360"
-        value="0"
-      />
-
-      <label>Z Rotation: <span id="valueZ">0</span>°</label>
-      <input
-        type="range"
-        id="sliderZ"
-        class="slider"
-        min="0"
-        max="360"
-        value="0"
-      />
-
-      <!-- Sliders for scale -->
-      <label>Scale: <span id="valueScale">1</span></label>
-      <input
-        type="range"
-        id="sliderScale"
-        class="slider"
-        min="0.1"
-        max="5"
-        step="0.1"
-        value="1"
-      />
-
-      <!-- Sliders for position -->
-      <label>X Position: <span id="valuePosX">0</span></label>
-      <input
-        type="range"
-        id="sliderPosX"
-        class="slider"
-        min="-5"
-        max="5"
-        step="0.1"
-        value="0"
-      />
-
-      <label>Y Position: <span id="valuePosY">0</span></label>
-      <input
-        type="range"
-        id="sliderPosY"
-        class="slider"
-        min="-5"
-        max="5"
-        step="0.1"
-        value="0"
-      />
-
-      <label>Z Position: <span id="valuePosZ">0</span></label>
-      <input
-        type="range"
-        id="sliderPosZ"
-        class="slider"
-        min="-5"
-        max="5"
-        step="0.1"
-        value="0"
-      />
-    </div>
-
-    <a-scene
-      vr-mode-ui="enabled: false;"
-      loading-screen="enabled: false;"
-      renderer="logarithmicDepthBuffer: true;"
-      arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
-      id="scene"
-      embedded
-      gesture-detector
-    >
-      <div
-        style="
-          color: white;
-          font-size: 24px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100%;
-          text-align: center;
-        "
-      >
-        Prueba 34
-      </div>
-      <!-- Primer marcador con una imagen
-      <a-marker
-        id="marker1"
-        type="pattern"
-        preset="custom"
-        url="assets/marker.patt"
-        raycaster="objects: .clickable"
-        emitevents="true"
-        cursor="fuse: false; rayOrigin: mouse;"
-      >
-        <a-image
-          id="imagen"
-          src="assets/calaverita1.jpg"
-          scale="1 1 1"
-          class="clickable"
-          rotation="-90 0 0"
-        ></a-image>
-      </a-marker> -->
-
-      <!-- Segundo marcador con un modelo 3D -->
-      <a-marker
-        id="animated-marker"
-        type="pattern"
-        preset="custom"
-        url="assets/pattern-go.patt"
-        raycaster="objects: .clickable"
-        emitevents="true"
-        cursor="fuse: false; rayOrigin: mouse;"
-      >
-        <a-entity
-          id="bowser-model"
-          scale="1 1 1"
-          animation-mixer="loop: repeat"
-          gltf-model="https://cdn.glitch.global/5288d06e-f6b7-4615-8874-97dbd0f03625/alebrije-azul.gltf?v=1728530834538"
-          class="clickable"
-          gesture-handler
-          position="0 0 0"
-          rotation="0 0 0"
-        ></a-entity>
-      </a-marker>
-
-      <a-entity camera></a-entity>
-    </a-scene>
-
-    <script>
-      const model = document.getElementById("bowser-model");
-
-      // Sliders for rotation
-      const sliderX = document.getElementById("sliderX");
-      const sliderY = document.getElementById("sliderY");
-      const sliderZ = document.getElementById("sliderZ");
-
-      // Sliders for position
-      const sliderPosX = document.getElementById("sliderPosX");
-      const sliderPosY = document.getElementById("sliderPosY");
-      const sliderPosZ = document.getElementById("sliderPosZ");
-
-      // Slider for scale
-      const sliderScale = document.getElementById("sliderScale");
-
-      // Value displays
-      const valueX = document.getElementById("valueX");
-      const valueY = document.getElementById("valueY");
-      const valueZ = document.getElementById("valueZ");
-      const valuePosX = document.getElementById("valuePosX");
-      const valuePosY = document.getElementById("valuePosY");
-      const valuePosZ = document.getElementById("valuePosZ");
-      const valueScale = document.getElementById("valueScale");
-
-      // Update rotation, position, and scale based on slider values
-      function updateAttributes() {
-        const rotationX = sliderX.value;
-        const rotationY = sliderY.value;
-        const rotationZ = sliderZ.value;
-        const posX = sliderPosX.value;
-        const posY = sliderPosY.value;
-        const posZ = sliderPosZ.value;
-        const scale = sliderScale.value;
-
-        model.setAttribute(
-          "rotation",
-          `${rotationX} ${rotationY} ${rotationZ}`
-        );
-        model.setAttribute("position", `${posX} ${posY} ${posZ}`);
-        model.setAttribute("scale", `${scale} ${scale} ${scale}`);
-
-        // Update displayed values
-        valueX.textContent = rotationX;
-        valueY.textContent = rotationY;
-        valueZ.textContent = rotationZ;
-        valuePosX.textContent = posX;
-        valuePosY.textContent = posY;
-        valuePosZ.textContent = posZ;
-        valueScale.textContent = scale;
+      h1 {
+	  font-size: 16px;
+	  font-family: Segoe UI;
+	  line-height: 20px;
+	  color: whitesmoke;
+	  display: table-cell;
+	  padding: 13px 0px 0px 20px;
       }
 
-      // Add input event listeners to sliders
-      sliderX.addEventListener("input", updateAttributes);
-      sliderY.addEventListener("input", updateAttributes);
-      sliderZ.addEventListener("input", updateAttributes);
-      sliderPosX.addEventListener("input", updateAttributes);
-      sliderPosY.addEventListener("input", updateAttributes);
-      sliderPosZ.addEventListener("input", updateAttributes);
-      sliderScale.addEventListener("input", updateAttributes);
-    </script>
-  </body>
+      #heading {
+	  background-color: black;
+	  height: 50px;
+      }
+
+      .main {
+	  margin: 18px;
+	  border-radius: 4px;
+      }
+
+      div[role="form"]{
+	  background-color: black;
+      }
+
+      #webchat {
+	  position: fixed;
+	  height: calc(100% - 50px);
+	  width: 100%;
+	  top: 50px;
+	  overflow: hidden;
+      }
+  #heading {
+    background-color: black;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    height: 50px;
+    width: 100%;
+    overflow: hidden;
+    position: fixed;
+  }
+
+  h1 {
+    font-size: 14px;
+    font-family: Segoe UI;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 20px;
+    color: #F3F2F1;
+    letter-spacing: 0.005em;
+    display: table-cell;
+    vertical-align: middle;
+    padding: 13px 0px 0px 20px;
+  }
+
+  #chatwindow {
+    height: 80%;
+    width: 100%;
+    overflow: hidden;
+    position: fixed;
+  }
+
+  #loginButton {
+
+    height: 100px;
+    width: 100%;
+    position: fixed;
+  }
+  </style>
+
+</head>
+<body>
+<div id="chatwindow">
+  <div id="heading">
+    <div><span>SSO Test Bot</span></div>
+  </div>
+  <div style="z-index: 100;position: absolute;margin-top: 50px;width: 100%;">
+  <div>
+    <label id="userName" name="userName" style="width:75%;height:15px;border-color: Transparent;">Not logged in.</label>
+    <button id="login" name="login" onclick="onSignInClick()" style="float: right;background-color: aliceblue;">Log In</button>
+  </div>
+</div>
+  <div id="webchat">
+  </div>
+
+</div>
+
+<script>
+function onSignin(idToken) {
+      let user = clientApplication.getAccount();
+      document.getElementById("userName").innerHTML = "Currently logged in as " + user.name;
+      let requestObj1 = {
+	scopes: ["user.read", 'openid', 'profile']
+      };
+    }
+
+    function onSignInClick() {
+      let requestObj = {
+	scopes: ["user.read", 'openid', 'profile']
+      };
+
+      clientApplication.loginPopup(requestObj).then(onSignin).catch(function (error) {console.log(error) });
+    }
+
+function getOAuthCardResourceUri(activity) {
+  if (activity &&
+       activity.attachments &&
+       activity.attachments[0] &&
+       activity.attachments[0].contentType === 'application/vnd.microsoft.card.oauth' &&
+       activity.attachments[0].content.tokenExchangeResource) {
+	 // asking for token exchange with AAD
+	 return activity.attachments[0].content.tokenExchangeResource.uri;
+   }
+}
+
+function exchangeTokenAsync(resourceUri) {
+  let user = clientApplication.getAccount();
+   if (user) {
+     let requestObj = {
+       scopes: [resourceUri]
+     };
+     return clientApplication.acquireTokenSilent(requestObj)
+       .then(function (tokenResponse) {
+	 return tokenResponse.accessToken;
+	 })
+	 .catch(function (error) {
+	   console.log(error);
+	 });
+	 }
+	 else {
+	 return Promise.resolve(null);
+   }
+}
+
+async function fetchJSON(url, options = {}) {
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+	...options.headers,
+	accept: 'application/json'
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch JSON due to ${res.status}`);
+    }
+
+    return await res.json();
+  } 
+</script>
+
+<script>
+     var clientApplication;
+     (function (){
+       var msalConfig = {
+	   auth: {
+	     clientId: '2c5ba857-d7f9-42ee-9f48-2d283c3bad37',
+	     authority: 'https://login.microsoftonline.com/17a8b2c6-b69e-4f1f-8377-a679f3ae4b47'
+	   },
+	   cache: {
+	     cacheLocation: 'localStorage',
+	     storeAuthStateInCookie: false
+	   }
+       };
+       if (!clientApplication) {
+	 clientApplication = new Msal.UserAgentApplication(msalConfig);
+       }
+     } ());
+
+(async function main() {
+
+    // Add your BOT ID below 
+    var theURL = "https://073947df8bc2e038af284aec516bae.16.environment.api.powerplatform.com/powervirtualagents/botsbyschema/cr904_pruebas/directline/token?api-version=2022-03-01-preview" // you can find the token URL via the mobile app channel configuration
+
+	var userId = clientApplication.account?.accountIdentifier != null ? 
+					("You-customized-prefix" + clientApplication.account.accountIdentifier).substr(0, 64) 
+					: (Math.random().toString() + Date.now().toString()).substr(0,64);
+					
+   const { token } = await fetchJSON(theURL);
+   const directLine = window.WebChat.createDirectLine({ token });
+   const store = WebChat.createStore({}, ({ dispatch }) => next => action => {
+      const { type } = action;
+      if (action.type === 'DIRECT_LINE/CONNECT_FULFILLED') {
+	dispatch({
+	  type: 'WEB_CHAT/SEND_EVENT',
+	  payload: {
+	    name: 'startConversation',
+	    type: 'event',
+	    value: { text: "hello" }
+	  }
+	});
+	return next(action);
+      }
+      if (action.type === 'DIRECT_LINE/INCOMING_ACTIVITY') {
+	const activity = action.payload.activity;
+	let resourceUri;
+	if (activity.from && activity.from.role === 'bot' &&
+	  (resourceUri = getOAuthCardResourceUri(activity))) {
+	  exchangeTokenAsync(resourceUri).then(function (token) {
+	    if (token) {
+	      directLine.postActivity({
+		type: 'invoke',
+		name: 'signin/tokenExchange',
+		value: {
+		  id: activity.attachments[0].content.tokenExchangeResource.id,
+		  connectionName: activity.attachments[0].content.connectionName,
+		  token
+		},
+		"from": {
+		  id: userId,
+		  name: clientApplication.account.name,
+		  role: "user"
+		}
+	      }).subscribe(
+		id => {
+		  if (id === 'retry') {
+		    // bot was not able to handle the invoke, so display the oauthCard
+		    return next(action);
+		  }
+		  // else: tokenexchange successful and we do not display the oauthCard
+		},
+		error => {
+		  // an error occurred to display the oauthCard
+		  return next(action);
+		}
+	      );
+	      return;
+	    }
+	    else
+	      return next(action);
+	  });
+	}
+	else
+	  return next(action);
+      }
+      else
+	return next(action);
+    });
+
+      const styleOptions = {
+
+	 // Add styleOptions to customize Web Chat canvas
+	 hideUploadButton: true
+      };
+
+
+	      window.WebChat.renderWebChat(
+		  {
+		      directLine: directLine,
+			  store,
+			  userID:userId,
+		      styleOptions
+		  },
+		  document.getElementById('webchat')
+	      );
+})().catch(err => console.error("An error occurred: " + err));
+  </script>
+</body>
 </html>
